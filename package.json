@@ -1,0 +1,22 @@
+{
+  "name": "attendance-frontend",
+  "version": "1.0.0",
+  "description": "My awesome Nuxt.js project",
+  "author": "anishghimire",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/pwa": "^3.0.0-0",
+    "nuxt": "^2.0.0"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.10.1",
+    "@nuxtjs/vuetify": "^1.0.0"
+  }
+}
