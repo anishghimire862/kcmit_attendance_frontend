@@ -3,7 +3,10 @@
     <v-data-table
       :headers="headers"
       :items="apiDataStudents"
+      v-model="selected"
+      item-key="id"
       hide-default-footer
+      @current-items="allStudentsList"
     >
       <template v-slot:item.name="{ item }">
         <span
@@ -24,7 +27,7 @@
           value
           indeterminate
           class="adjust-height"
-          :v-model="status"
+          v-model="item.selected"
         >
         </v-checkbox>
       </template>
@@ -61,52 +64,58 @@
           { text: 'Status', value: 'status', sortable: false }
         ],
         apiDataStudents: [],
-        status: false
+        status: false,
+        faculty: null,
+        section: null,
+        semester: null,
+        selected: [],
+        obj: {}
       }
     },
-    created () {
+    mounted () {
+      this.faculty = this.$route.params.faculty
+      this.semester = this.$route.params.semester
+      this.section = this.$route.params.section
       this.getData()
     },
     methods: {
-      clicked (event) {
-        console.log(event)
-      },
-      getColor(count) {
-        return count > 10 ? 'green' : 'red'
-      },
       getData () {
-        const url = '/students/'
-        // for reference inside promise
+        const url = '/attendance/'
         let self = this
-        this.$axios.get(url)
+        this.$axios.get(url +this.faculty + '/' + this.section + '/' + this.semester + '/')
           .then (function(response) {
-            self.apiDataStudents = response.data.data
+            self.apiDataStudents = response.data.students
           })
       },
       submitData () {
-        let semester = this.$router.params.semester
-        let faculty = this.$router.params.faculty
-        let section = this.$router.params.section
-        let name = this.name
-        let status = this.status
-
-        let formData = new FormData()
-
-        formData.append("semester", semester)
-        formData.append("faculty", faculty)
-        formData.append("section", section)
-        formData.append("name", name)
-        formData.append("status", status)
-
-        const url = '/attendance/'
-        let self = this
-        this.$axios.post(url, status)
-          .then(function (response) {
-            console.log('Submitted')
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
+        // const url = '/attendance/'
+        // let self = this
+        // this.$axios.post(url, this.editedItem)
+        //   .then(function (response) {
+        //     console.log('Submitted')
+        //   })
+        //   .catch(function (error) {
+        //     console.log(error)
+        //   })
+        // console.log(this.selected)
+      },
+      allStudentsList (event) {
+        for(var key in event) {
+          if(event[key].selected == true) {
+            this.obj = {
+              status: true,
+              student_semester_id: event[key].student_semester_id,
+              subject_id: '1'
+            }
+          }
+          else {
+            this.obj = {
+              status: false,
+              student_semester_id: event[key].student_semester_id,
+              subject_id: '1'
+            }
+          }
+        }
       }
     }
   }

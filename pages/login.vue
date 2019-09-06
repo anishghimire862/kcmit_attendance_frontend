@@ -26,7 +26,6 @@
                     prepend-icon="mdi-lock"
                     v-model="password"
                   >
-                  {{ password }}
                   </v-text-field>
                 </v-form>
                 <div class="text-xs-right">
@@ -47,6 +46,34 @@
   export default {
     components: {
       KcmitImage
+    },
+    data () {
+      return{
+        email: '',
+        password: ''
+      }
+    },
+    created () {
+    if (this.$auth.loggedIn) {
+      this.$router.push('/selection')
+    }
+  },
+
+    methods: {
+      async submitLogin() {
+        try {
+        await this.$auth.loginWith('local', {
+          data: {
+            email: this.email,
+            password: this.password
+          }
+        })
+        this.$router.push('/selection')
+      } catch (e) {
+        console.log(e + 'error')
+      }
+
+      }
     }
   }
 </script>

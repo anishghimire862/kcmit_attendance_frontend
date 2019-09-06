@@ -1,8 +1,11 @@
 <template>
   <v-autocomplete
-    :label="label"
-    :items="items"
-    v-model="name"
+    :label="autoCompleteLabel"
+    :items="modelItems"
+    :item-text="autoCompleteText"
+    :item-value="itemValue"
+    v-model="modelName"
+    @change="aaa"
   ></v-autocomplete>
 </template>
 <script>
@@ -20,6 +23,41 @@
       name: {
         type: String,
         required: false
+      },
+      itemText: {
+        type: String,
+        required: false
+      },
+      itemValue: {
+        type: String,
+        required: false
+      }
+    },
+    data () {
+      return {
+        autoCompleteLabel: '',
+        autoCompleteItems: [],
+        autoCompleteName: '',
+        autoCompleteText: '',
+      }
+    },
+    computed: {
+      modelName () {
+        this.autoCompleteName = this.name
+        return this.autoCompleteName
+      },
+      modelItems () {
+        this.autoCompleteItems = this.items
+        return this.autoCompleteItems
+      }
+    },
+    mounted () {
+      this.autoCompleteLabel = this.label
+      this.autoCompleteText = this.itemText
+    },
+    methods: {
+      aaa(value) {
+        alert(value)
       }
     }
   }

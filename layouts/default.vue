@@ -43,6 +43,12 @@
       </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
+      <v-icon
+        v-if="isUserLoggedIn"
+        @click="logout"
+      >
+        mdi-logout
+      </v-icon>
     </v-app-bar>
     <v-content>
       <v-container>
@@ -80,7 +86,17 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'KCMIT'
+      title: 'KCMIT',
+    }
+  },
+  methods: {
+    async logout () {
+      await this.$auth.logout()
+    }
+  },
+  computed: {
+    isUserLoggedIn () {
+      return this.$auth.loggedIn
     }
   }
 }

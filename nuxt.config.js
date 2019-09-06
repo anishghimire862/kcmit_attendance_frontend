@@ -30,12 +30,14 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/vuetify'
   ],
   /*
   ** Nuxt.js dev-modules
   */
   devModules: [
     '@nuxtjs/vuetify',
+
   ],
   /*
   ** Nuxt.js modules
@@ -44,7 +46,29 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    '@nuxtjs/auth',
   ],
+  auth: {
+    // options
+    redirect: {
+      login: '/login',
+      logout: '/',
+      home: '/selection',
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/login/', method: 'post', propertyName: 'token' },
+          logout: false,
+          user: { url: '/api/auth/user/', method: 'get', propertyName: false },
+        },
+      },
+    },
+    tokenType: 'Bearer'
+  },
+  router: {
+    middleware: ['auth']
+  },
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options
@@ -82,6 +106,7 @@ export default {
     ** You can extend webpack config here
     */
     extend (config, ctx) {
+        // Run ESLint on save
     }
   }
 }
