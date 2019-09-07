@@ -23,6 +23,7 @@
                   </v-text-field>
                   <v-text-field
                     label="Password"
+                    type="password"
                     prepend-icon="mdi-lock"
                     v-model="password"
                   >
@@ -38,6 +39,7 @@
           </v-container>
           </v-flex>
         </v-flex>
+        <v-snackbar/>
       </v-card>
   </div>
 </template>
@@ -61,6 +63,7 @@
 
     methods: {
       async submitLogin() {
+        let self = this
         try {
         await this.$auth.loginWith('local', {
           data: {
@@ -70,7 +73,7 @@
         })
         this.$router.push('/selection')
       } catch (e) {
-        console.log(e + 'error')
+        self.$toast.error('Invalid login or missing credentials.')
       }
 
       }

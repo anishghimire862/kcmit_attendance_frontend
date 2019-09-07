@@ -113,6 +113,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar />
   </div>
 </template>
 <script>
@@ -128,34 +129,12 @@
         dialog: false,
         url: '',
         headers: [
-          {
-            text: 'S.N.',
-            align: 'left',
-            sortable: false,
-            value: 'sn',
-          },
           { text: 'Image', value: 'image' },
           { text: 'Name', value: 'name' },
           { text: 'Email', value: 'email' },
           { text: 'Batch', value: 'batch' },
           { text: 'Faculty', value: 'faculty', sortable: false },
           { text: 'Actions', value: 'actions', sortable: false },
-        ],
-        items: [
-          {
-            name: 'Frozen Yogurt',
-            image: 'imgpsh_mobile_save.jpeg',
-            email: 'anishg@gmail.com',
-            batch: 2016,
-            faculty: 'BIM',
-          },
-          {
-            name: 'Ice cream sandwich',
-            image: 'imgpsh_mobile_save.jpeg',
-            email: 'anish@gmail.cp',
-            batch: 2016,
-            faculty: 'BIM',
-          }
         ],
         listTitle: 'Students',
         editItem: false,
@@ -222,13 +201,27 @@
       submitData () {
         const url = '/students/'
         let self = this
-        this.$axios.post(url, this.editedItem)
-          .then(function (response) {
-            console.log('Submitted')
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
+        if(this.editItem) {
+          this.$axios.patch(url, this.editedItem)
+            .then(function (response) {
+              self.$toast('Student details updated successfully.')
+              self.getData()
+              self.close()
+            })
+            .catch(function (error) {
+              self.$toast.error('There was a problem.')
+            })
+        } else {
+          this.$axios.post(url, this.editedItem)
+            .then(function (response) {
+              self.$toast('Student added successfully.')
+              self.getData()
+              self.close()
+            })
+            .catch(function (error) {
+              self.$toast.error('There was a problem.')
+            })
+        }
       }
     }
   }

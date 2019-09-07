@@ -121,12 +121,6 @@
       return {
         dialog: false,
         headers: [
-          {
-            text: 'S.N.',
-            align: 'left',
-            sortable: false,
-            value: 'sn',
-          },
           { text: 'Image', value: 'image' },
           { text: 'Name', value: 'name' },
           { text: 'From', value: 'from' },

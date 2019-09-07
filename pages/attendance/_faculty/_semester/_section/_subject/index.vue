@@ -54,12 +54,6 @@
     data () {
       return {
         headers: [
-          {
-            text: 'ID',
-            align: 'left',
-            sortable: true,
-            value: 'id',
-          },
           { text: 'Image', value: 'image', sortable: false },
           { text: 'Name', value: 'name', sortable: true },
           { text: 'Status', value: 'status', sortable: false }

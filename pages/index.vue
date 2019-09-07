@@ -1,92 +1,79 @@
 <template>
-  <v-layout
-    column
-    justify-center
-    align-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
+  <div>
       <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
+        <v-flex
+          d-flex
+        >
+          <v-flex
           >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
+            <kcmit-image />
+          </v-flex>
+          <v-flex
+            class="mx-5 my-5"
           >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
+          <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+              <v-flex>
+                <v-form>
+                  <v-text-field
+                    label="Email"
+                    prepend-icon="mdi-mail"
+                    v-model="email"
+                  >
+                  </v-text-field>
+                  <v-text-field
+                    label="Password"
+                    prepend-icon="mdi-lock"
+                    v-model="password"
+                  >
+                  </v-text-field>
+                </v-form>
+                <div class="text-xs-right">
+                  <v-btn @click="submitLogin" color="secondary" width="100">
+                    Login
+                  </v-btn>
+                </div>
+              </v-flex>
+            </v-layout>
+          </v-container>
+          </v-flex>
+        </v-flex>
       </v-card>
-    </v-flex>
-  </v-layout>
+  </div>
 </template>
-
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+  import KcmitImage from '@/components/KcmitImage'
+  export default {
+    components: {
+      KcmitImage
+    },
+    data () {
+      return{
+        email: '',
+        password: ''
+      }
+    },
+    created () {
+    if (this.$auth.loggedIn) {
+      this.$router.push('/selection')
+    }
+  },
 
-export default {
-  components: {
-    Logo,
-    VuetifyLogo
+    methods: {
+      async submitLogin() {
+        try {
+        await this.$auth.loginWith('local', {
+          data: {
+            email: this.email,
+            password: this.password
+          }
+        })
+        this.$router.push('/selection')
+      } catch (e) {
+        console.log(e + 'error')
+      }
+
+      }
+    }
   }
-}
 </script>

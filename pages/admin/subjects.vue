@@ -87,6 +87,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar/>
   </div>
 </template>
 <script>
@@ -100,12 +101,6 @@
         dialog: false,
         url: '',
         headers: [
-          {
-            text: 'S.N.',
-            align: 'left',
-            sortable: false,
-            value: 'sn',
-          },
           { text: 'Subject Code', value: 'subject_code' },
           { text: 'Subject Name', value: 'subject_name' },
           { text: 'Actions', value: 'actions', sortable: false },
@@ -178,10 +173,22 @@
         const url = '/subjects/'
         // for reference inside promise
         let self = this
-        this.$axios.post(url, this.editedItem)
-          .then (function(response) {
-            console.log('Done')
-          })
+        if(this.editItem) {
+          this.$axios.patch(url, this.editedItem)
+            .then (function(response) {
+              self.$toast('Subject updated successfully')
+              self.getData()
+              self.close()
+            })
+        } else {
+          this.$axios.post(url, this.editedItem)
+            .then (function(response) {
+              self.$toast('Subject added successfully')
+              self.getData()
+              self.close()
+
+            })
+        }
       },
     }
   }

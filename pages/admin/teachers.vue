@@ -106,6 +106,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar/>
   </div>
 </template>
 <script>
@@ -121,12 +122,6 @@
         dialog: false,
         url: '',
         headers: [
-          {
-            text: 'S.N.',
-            align: 'left',
-            sortable: false,
-            value: 'sn',
-          },
           { text: 'Image', value: 'image' },
           { text: 'Name', value: 'name' },
           { text: 'Email', value: 'email' },
@@ -208,13 +203,28 @@
       submitData () {
         const url = '/teachers/'
         let self = this
-        this.$axios.post(url, this.editedItem)
-          .then(function (response) {
-            console.log('Submitted')
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
+        if(this.editItem) {
+          this.$axios.patch(url, this.editedItem)
+            .then(function (response) {
+              self.$toast('Teacher updated successfully')
+              self.getData()
+              self.close()
+
+            })
+            .catch(function (error) {
+              self.$toast.error('There was an error, please try again.')
+            })
+        } else {
+          this.$axios.post(url, this.editedItem)
+            .then(function (response) {
+              self.$toast('Please inform to check email for login details')
+              self.getData()
+              self.close()
+            })
+            .catch(function (error) {
+              self.$toast.error('There was an error, please try again.')
+            })
+        }
       }
     }
   }

@@ -1,6 +1,13 @@
 <template>
   <v-card>
     <v-card-text>
+      <v-alert
+        dense
+        text
+        type="success"
+      >
+        Please make your selection to view attendance.
+      </v-alert>
       <v-form>
         <v-container>
           <v-row>
@@ -11,7 +18,7 @@
               <v-select
                 :items="faculties"
                 v-model="faculty"
-                label="Select Faculty"
+                label="Faculty"
               ></v-select>
             </v-col>
             <v-col
@@ -21,7 +28,7 @@
               <v-select
                 :items="semesters"
                 v-model="semester"
-                label="Select Semester"
+                label="Semester"
               ></v-select>
             </v-col>
             <v-col
@@ -31,7 +38,7 @@
               <v-select
                 :items="sections"
                 v-model="section"
-                label="Select Section"
+                label="Section"
               ></v-select>
             </v-col>
             <v-col
@@ -39,7 +46,7 @@
               md="3"
             >
               <v-autocomplete
-                label="Select Subject"
+                label="Subject"
                 :items="subjects"
                 item-text="subject_name"
                 item-value="subject_code"
@@ -63,7 +70,7 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="fromDate"
-                    label="Select date to select attendance from"
+                    label="From"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-on="on"
@@ -91,7 +98,7 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="toDate"
-                    label="Select last date to select attendance"
+                    label="To"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-on="on"

@@ -51,8 +51,8 @@ export default {
   auth: {
     // options
     redirect: {
-      login: '/login',
-      logout: '/',
+      login: '/login/',
+      logout: '/login',
       home: '/selection',
     },
     strategies: {

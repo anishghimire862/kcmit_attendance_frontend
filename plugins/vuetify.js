@@ -11,5 +11,6 @@ Vue.use(Vuetify, {
 Vue.use(VuetifyToast, {
   color: 'primary',
   timeout: 4000,
+  autoHeight: true,
   dismissable: true
 })

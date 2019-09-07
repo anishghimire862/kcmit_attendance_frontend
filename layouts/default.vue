@@ -2,31 +2,73 @@
   <v-app
     class="background-color"
   >
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-      color="#e7e7e7"
+    <v-card
     >
-      <v-list>
+      <v-navigation-drawer
+        v-model="drawer"
+        :mini-variant="miniVariant"
+        :clipped="clipped"
+        fixed
+        app
+        color="#e7e7e7"
+      >
         <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
+          dense
         >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+          <v-list-item-content
+            dense
+          >
+            <v-list-item-title class="title body-1">
+              KCMIT Attendance
+            </v-list-item-title>
+            <v-list-item-subtitle
+              class="subtitle"
+              v-if="user"
+            >
+              Welcome, {{ user }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+        <v-list
+          v-if="user === 'admin'"
+          dense
+        >
+          <v-list-item
+            v-for="(item, i) in adminItems"
+            :key="i"
+            :to="item.to"
+            router
+            dense
+          >
+            <v-list-item-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.title" />
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+        <v-list
+          v-if="user === 'teacher'"
+          dense
+        >
+          <v-list-item
+            v-for="(item, i) in teacherItems"
+            :key="i"
+            :to="item.to"
+            router
+            dense
+          >
+            <v-list-item-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.title" />
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+    </v-card>
     <v-app-bar
       :clipped-left="clipped"
       fixed
@@ -46,6 +88,7 @@
       <v-icon
         v-if="isUserLoggedIn"
         @click="logout"
+        color="white"
       >
         mdi-logout
       </v-icon>
@@ -71,16 +114,48 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      items: [
+      adminItems: [
+        {
+          icon: 'mdi-newspaper',
+          title: 'Attendance',
+          to: '/selection'
+        },
+        {
+          icon: 'mdi-account',
+          title: 'Students',
+          to: '/admin/students'
+        },
+        {
+          icon: 'mdi-account-check',
+          title: 'Teachers',
+          to: '/admin/teachers'
+        },
+        {
+          icon: 'mdi-book-open-page-variant',
+          title: 'Subjects',
+          to: '/admin/subjects'
+        },
+        {
+          icon: 'mdi-account',
+          title: 'Student Semesters',
+          to: '/admin/student-semester'
+        },
+        {
+          icon: 'mdi-account-check',
+          title: 'Teacher Subjects',
+          to: '/admin/teacher-subject'
+        }
+      ],
+      teacherItems: [
         {
           icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
+          title: 'Attendance',
+          to: '/selection'
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
+          title: 'View Attendance',
+          to: '/sheet'
         }
       ],
       miniVariant: false,
@@ -97,6 +172,10 @@ export default {
   computed: {
     isUserLoggedIn () {
       return this.$auth.loggedIn
+    },
+    user () {
+      if(this.$auth.loggedIn)
+        return this.$auth.user.role
     }
   }
 }

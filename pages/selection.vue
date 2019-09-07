@@ -1,6 +1,14 @@
 <template>
   <v-card>
     <v-card-text>
+      <v-alert
+        dense
+        text
+        type="success"
+      >
+        Please make your selection in order to take attendance.
+      </v-alert>
+
       <v-form>
         <v-container>
           <v-row>
@@ -11,7 +19,7 @@
               <v-select
                 :items="faculties"
                 v-model="faculty"
-                label="Select Faculty"
+                label="Faculty"
               ></v-select>
             </v-col>
             <v-col
@@ -21,7 +29,7 @@
               <v-select
                 :items="semesters"
                 v-model="semester"
-                label="Select Semester"
+                label="Semester"
               ></v-select>
             </v-col>
             <v-col
@@ -31,7 +39,7 @@
               <v-select
                 :items="sections"
                 v-model="section"
-                label="Select Section"
+                label="Section"
               ></v-select>
             </v-col>
             <v-col
@@ -39,7 +47,7 @@
               md="3"
             >
               <v-autocomplete
-                label="Select Subject"
+                label="Subject"
                 :items="subjects"
                 item-text="subject_name"
                 item-value="id"
