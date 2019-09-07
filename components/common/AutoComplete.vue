@@ -5,7 +5,6 @@
     :item-text="autoCompleteText"
     :item-value="itemValue"
     v-model="modelName"
-    @change="aaa"
   ></v-autocomplete>
 </template>
 <script>
@@ -56,9 +55,6 @@
       this.autoCompleteText = this.itemText
     },
     methods: {
-      aaa(value) {
-        alert(value)
-      }
     }
   }
 </script>

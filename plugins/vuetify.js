@@ -7,4 +7,9 @@ Vue.use(Vuetify, {
     VSnackbar
   }
 })
-Vue.use(VuetifyToast)
+
+Vue.use(VuetifyToast, {
+  color: 'primary',
+  timeout: 4000,
+  dismissable: true
+})

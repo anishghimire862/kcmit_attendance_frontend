@@ -38,16 +38,72 @@
               cols="12"
               md="3"
             >
-              <AutoComplete
+              <v-autocomplete
                 label="Select Subject"
                 :items="subjects"
-                :name="subject_code"
                 item-text="subject_name"
                 item-value="subject_code"
-              ></AutoComplete>
+                v-model="subjectId"
+              ></v-autocomplete>
             </v-col>
           </v-row>
           <v-row>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-dialog
+                ref="dialog"
+                v-model="fromModal"
+                :return-value.sync="fromDate"
+                persistent
+                full-width
+                width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="fromDate"
+                    label="Select date to select attendance from"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="fromDate" scrollable>
+                  <div class="flex-grow-1"></div>
+                  <v-btn text color="primary" @click="fromModal = false">Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.dialog.save(fromDate)">OK</v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-dialog
+                ref="toDialog"
+                v-model="toModal"
+                :return-value.sync="toDate"
+                persistent
+                full-width
+                width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="toDate"
+                    label="Select last date to select attendance"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="toDate" scrollable>
+                  <div class="flex-grow-1"></div>
+                  <v-btn text color="primary" @click="toModal = false">Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.toDialog.save(toDate)">OK</v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
             <v-col>
               <div
                 class="text-right"
@@ -65,6 +121,70 @@
           </v-row>
         </v-container>
       </v-form>
+      <v-sheet height="600">
+        <v-btn
+          class="ma-2"
+          outlined
+          color="indigo"
+          v-if="showBackButton"
+          @click="back"
+        >
+          Back
+        </v-btn>
+        <v-calendar
+          v-if="loadCalendar"
+          color="primary"
+          :events="events"
+          :type="type"
+          @click:event="showEvent"
+          @click:more="viewDay"
+          @click:date="viewDay"
+        ></v-calendar>
+        <v-menu
+            v-model="selectedOpen"
+            :close-on-content-click="false"
+            :activator="selectedElement"
+            :type="type"
+            full-width
+            offset-x
+          >
+            <v-card
+              color="grey lighten-4"
+              min-width="350px"
+              flat
+            >
+              <v-toolbar
+                color="primary"
+              >
+                <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+                <div class="flex-grow-1"></div>
+              </v-toolbar>
+              <v-card-text>
+                <span>
+                  <span
+                    v-if="selectedEvent.status === '1'"
+                  >
+                    The student was present on this day.
+                  </span>
+                  <span
+                    v-else
+                  >
+                    The selected student was marked as absent on this day.
+                  </span>
+                </span>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn
+                  text
+                  color="secondary"
+                  @click="selectedOpen = false"
+                >
+                  Cancel
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-menu>
+      </v-sheet>
     </v-card-text>
     <v-snackbar/>
   </v-card>
@@ -84,7 +204,23 @@ export default {
         faculties: ['BIM', 'BBA', 'BCA'],
         faculty: null,
         subjects: [],
-        subject_code: ''
+        subjectId: null,
+        fromDate: new Date().toISOString().substr(0,10),
+        toDate: new Date().toISOString().substr(0,10),
+        fromMenu: false,
+        toMenu: false,
+        toModal: false,
+        fromModal: false,
+        events: [],
+        splittedEvents: [],
+        loadCalendar: false,
+        today: '2019-01-08',
+        focus: '2019-01-08',
+        type: 'month',
+        selectedEvent: {},
+        selectedElement: null,
+        selectedOpen: false,
+        showBackButton: false
     }
   },
   mounted () {
@@ -93,19 +229,50 @@ export default {
   methods: {
     submit (event) {
       event.preventDefault()
-      this.redirectToAttendancePage()
-    },
-    redirectToAttendancePage () {
-      this.$router.push('/attendance/' + this.faculty + '/' + this.semester + '/' + this.section + '/')
+      const url = '/attendance_sheet/'
+        let self = this
+        this.$axios.get(url +this.semester + '/' + this.section + '/' + this.faculty + '/' + this.subjectId + '/' + this.fromDate + '/' +  this.toDate)
+          .then (function(response) {
+            self.events = response.data.data
+            self.splittedEvents = self.events.map(e =>  {
+              e.start = e.start.split('T')[0]
+            })
+          })
+      this.loadCalendar = true
     },
     getSubjects () {
       const url = '/subjects/'
       let self = this
       this.$axios.get(url)
         .then (function(response) {
-           self.subjects = response.data.data
+          self.subjects = response.data.data
         })
-    }
+    },
+    showEvent ({ nativeEvent, event }) {
+        const open = () => {
+          this.selectedEvent = event
+          this.selectedElement = nativeEvent.target
+          setTimeout(() => this.selectedOpen = true, 10)
+        }
+
+        if (this.selectedOpen) {
+          this.selectedOpen = false
+          setTimeout(open, 10)
+        } else {
+          open()
+        }
+
+        nativeEvent.stopPropagation()
+      },
+      viewDay ({ date }) {
+        this.focus = date
+        this.type = 'day'
+        this.showBackButton = true
+      },
+      back () {
+        this.type = 'month'
+        this.showBackButton = false
+      }
   }
 }
 </script>

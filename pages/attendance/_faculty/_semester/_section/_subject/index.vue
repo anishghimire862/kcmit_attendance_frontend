@@ -3,10 +3,10 @@
     <v-data-table
       :headers="headers"
       :items="apiDataStudents"
-      v-model="selected"
+      v-model="status"
       item-key="id"
       hide-default-footer
-      @current-items="allStudentsList"
+      ref="att"
     >
       <template v-slot:item.name="{ item }">
         <span
@@ -27,7 +27,7 @@
           value
           indeterminate
           class="adjust-height"
-          v-model="item.selected"
+          v-model="item.status"
         >
         </v-checkbox>
       </template>
@@ -46,6 +46,7 @@
         </div>
       </template>
     </v-data-table>
+    <v-snackbar/>
   </v-card>
 </template>
 <script>
@@ -68,14 +69,15 @@
         faculty: null,
         section: null,
         semester: null,
-        selected: [],
-        obj: {}
+        subjectId: null,
+        status: [],
       }
     },
     mounted () {
       this.faculty = this.$route.params.faculty
       this.semester = this.$route.params.semester
       this.section = this.$route.params.section
+      this.subjectId = this.$route.params.subject
       this.getData()
     },
     methods: {
@@ -88,35 +90,36 @@
           })
       },
       submitData () {
-        // const url = '/attendance/'
-        // let self = this
-        // this.$axios.post(url, this.editedItem)
-        //   .then(function (response) {
-        //     console.log('Submitted')
-        //   })
-        //   .catch(function (error) {
-        //     console.log(error)
-        //   })
-        // console.log(this.selected)
-      },
-      allStudentsList (event) {
-        for(var key in event) {
-          if(event[key].selected == true) {
-            this.obj = {
-              status: true,
-              student_semester_id: event[key].student_semester_id,
-              subject_id: '1'
-            }
+        let studentsData = this.$refs.att.items
+        let studentsAttendanceData = []
+        for(var key in studentsData) {
+          if(studentsData[key].status === false || !studentsData[key].status) {
+            studentsAttendanceData.push({
+              status: false,
+              student_id: studentsData[key].student_id,
+              student_semester_id: studentsData[key].student_semester_id,
+              subject_code: this.subjectId
+            })
           }
           else {
-            this.obj = {
-              status: false,
-              student_semester_id: event[key].student_semester_id,
-              subject_id: '1'
-            }
+            studentsAttendanceData.push({
+              status: true,
+              student_id: studentsData[key].student_id || null,
+              student_semester_id: studentsData[key].student_semester_id,
+              subject_code: this.subjectId
+            })
           }
         }
-      }
+        const url = '/attendance/'
+        let self = this
+        this.$axios.post(url, studentsAttendanceData)
+          .then(function (response) {
+            self.$toast('Attendance submitted successfully.')
+          })
+          .catch(function (error) {
+            self.$toast.error('There was an error, please try again.')
+          })
+      },
     }
   }
 </script>

@@ -38,13 +38,13 @@
               cols="12"
               md="3"
             >
-              <AutoComplete
+              <v-autocomplete
                 label="Select Subject"
                 :items="subjects"
-                :name="subject_code"
                 item-text="subject_name"
-                item-value="subject_code"
-              ></AutoComplete>
+                item-value="id"
+                v-model="subjectId"
+              ></v-autocomplete>
             </v-col>
           </v-row>
           <v-row>
@@ -84,7 +84,7 @@ export default {
         faculties: ['BIM', 'BBA', 'BCA'],
         faculty: null,
         subjects: [],
-        subject_code: ''
+        subjectId: ''
     }
   },
   mounted () {
@@ -96,7 +96,7 @@ export default {
       this.redirectToAttendancePage()
     },
     redirectToAttendancePage () {
-      this.$router.push('/attendance/' + this.faculty + '/' + this.semester + '/' + this.section + '/')
+      this.$router.push('/attendance/' + this.faculty + '/' + this.semester + '/' + this.section + '/' + this.subjectId + '/')
     },
     getSubjects () {
       const url = '/subjects/'
