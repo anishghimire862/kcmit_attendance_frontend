@@ -74,6 +74,12 @@
       this.subjectId = this.$route.params.subject
       this.getData()
     },
+    computed: {
+      userId () {
+        if(this.$auth.loggedIn)
+          return this.$auth.user.data[0].id
+      },
+    },
     methods: {
       getData () {
         const url = '/attendance/'
@@ -94,7 +100,8 @@
               semester: this.semester,
               student_id: studentsData[key].id,
               // student_semester_id: studentsData[key].student_semester_id,
-              subject_id: this.subjectId
+              subject_id: this.subjectId,
+              teacher_id_fk: this.userId
             })
           }
           else {
@@ -103,7 +110,8 @@
               student_id: studentsData[key].id || null,
               semester: this.semester,
               // student_semester_id: studentsData[key].student_semester_id,
-              subject_id: this.subjectId
+              subject_id: this.subjectId,
+              teacher_id_fk: this.userId
             })
           }
         }

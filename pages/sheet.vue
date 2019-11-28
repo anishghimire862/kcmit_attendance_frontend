@@ -167,9 +167,9 @@
                 flat
               >
                 <v-toolbar
-                  color="primary"
+                  :color="selectedEvent.status == 1 ? 'primary' : 'red'"
                 >
-                  <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+                <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
                   <div class="flex-grow-1"></div>
                 </v-toolbar>
                 <v-card-text>
@@ -177,13 +177,18 @@
                     <span
                       v-if="selectedEvent.status === '1'"
                     >
-                      {{ selectedEvent.name }} was present on this day for subject <a> {{ selectedEvent.subject }} </a>.
+                      {{ selectedEvent.name }} was present on this day.
                     </span>
                     <span
                       v-else
                     >
-                      {{ selectedEvent.name }} was marked as absent on this day for subject <a> {{ selectedEvent.subject }} </a>.
+                      {{ selectedEvent.name }} was marked as absent on this day.
                     </span>
+                    <div
+                      class="caption"
+                    >
+                      The attendance was submitted by: {{ selectedEvent.teacherName }}
+                    </div>
                   </span>
                 </v-card-text>
                 <v-card-actions>
@@ -237,11 +242,6 @@ export default {
   },
   created () {
     this.focus = this.fromDate
-  },
-  computed: {
-    isUser () {
-      return this.$auth.user
-    }
   },
   mounted () {
     this.getSubjects()
