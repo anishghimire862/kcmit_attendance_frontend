@@ -175,8 +175,8 @@ export default {
     },
     user () {
       if(this.$auth.loggedIn)
-        return this.$auth.user.role
-    }
+        return this.$auth.user.data[0].role
+    },
   }
 }
 </script>
