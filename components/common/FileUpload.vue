@@ -10,7 +10,7 @@
         text-truncate
         ma-auto
       >
-        <p v-if="fileName">
+        <p v-if="fileName && urlLink">
           {{ fileName }}
         </p>
         <p v-else>
