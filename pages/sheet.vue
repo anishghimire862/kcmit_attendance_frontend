@@ -1,5 +1,7 @@
 <template>
+  <div>
   <v-card>
+    {{ isUser }}
     <v-card-text>
       <v-alert
         dense
@@ -9,7 +11,6 @@
         Please make your selection to view attendance.
       </v-alert>
       <v-form>
-        <v-container>
           <v-row>
             <v-col
               cols="12"
@@ -126,8 +127,12 @@
               </div>
             </v-col>
           </v-row>
-        </v-container>
       </v-form>
+    </v-card-text>
+    <v-snackbar/>
+  </v-card>
+  <v-col v-if="loadCalendar" class="pa-0 ma-0 pt-3">
+    <v-card>
       <v-sheet height="600">
         <v-btn
           class="ma-2"
@@ -136,65 +141,66 @@
           v-if="showBackButton"
           @click="back"
         >
-          Back
-        </v-btn>
-        <v-calendar
-          v-if="loadCalendar"
-          color="primary"
-          :events="events"
-          :type="type"
-          @click:event="showEvent"
-          @click:more="viewDay"
-          @click:date="viewDay"
-        ></v-calendar>
-        <v-menu
+            Back
+          </v-btn>
+          <v-calendar
+            v-model="focus"
+            color="primary"
+            :events="events"
+            :event-color="getEventColor"
+            :type="type"
+            @click:event="showEvent"
+            @click:more="viewDay"
+            @click:date="viewDay"
+          ></v-calendar>
+          <v-menu
             v-model="selectedOpen"
             :close-on-content-click="false"
             :activator="selectedElement"
             :type="type"
             full-width
             offset-x
-          >
-            <v-card
-              color="grey lighten-4"
-              min-width="350px"
-              flat
             >
-              <v-toolbar
-                color="primary"
+              <v-card
+                color="grey lighten-4"
+                min-width="350px"
+                flat
               >
-                <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
-                <div class="flex-grow-1"></div>
-              </v-toolbar>
-              <v-card-text>
-                <span>
-                  <span
-                    v-if="selectedEvent.status === '1'"
-                  >
-                    The student was present on this day.
-                  </span>
-                  <span
-                    v-else
-                  >
-                    The selected student was marked as absent on this day.
-                  </span>
-                </span>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn
-                  text
-                  color="secondary"
-                  @click="selectedOpen = false"
+                <v-toolbar
+                  color="primary"
                 >
-                  Cancel
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-menu>
-      </v-sheet>
-    </v-card-text>
-    <v-snackbar/>
-  </v-card>
+                  <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+                  <div class="flex-grow-1"></div>
+                </v-toolbar>
+                <v-card-text>
+                  <span>
+                    <span
+                      v-if="selectedEvent.status === '1'"
+                    >
+                      {{ selectedEvent.name }} was present on this day for subject <a> {{ selectedEvent.subject }} </a>.
+                    </span>
+                    <span
+                      v-else
+                    >
+                      {{ selectedEvent.name }} was marked as absent on this day for subject <a> {{ selectedEvent.subject }} </a>.
+                    </span>
+                  </span>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn
+                    text
+                    color="secondary"
+                    @click="selectedOpen = false"
+                  >
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-menu>
+        </v-sheet>
+      </v-card>
+  </v-col>
+  </div>
 </template>
 <script>
 import AutoComplete from "~/components/common/AutoComplete.vue"
@@ -221,13 +227,20 @@ export default {
         events: [],
         splittedEvents: [],
         loadCalendar: false,
-        today: '2019-01-08',
-        focus: '2019-01-08',
+        focus: '',
         type: 'month',
         selectedEvent: {},
         selectedElement: null,
         selectedOpen: false,
         showBackButton: false
+    }
+  },
+  created () {
+    this.focus = this.fromDate
+  },
+  computed: {
+    isUser () {
+      return this.$auth.user
     }
   },
   mounted () {
@@ -241,9 +254,6 @@ export default {
         this.$axios.get(url +this.semester + '/' + this.section + '/' + this.faculty + '/' + this.subjectId + '/' + this.fromDate + '/' +  this.toDate)
           .then (function(response) {
             self.events = response.data.data
-            self.splittedEvents = self.events.map(e =>  {
-              e.start = e.start.split('T')[0]
-            })
           })
       this.loadCalendar = true
     },
@@ -279,6 +289,9 @@ export default {
       back () {
         this.type = 'month'
         this.showBackButton = false
+      },
+      getEventColor(event) {
+        return event.status == 1 ? 'primary' : 'red'
       }
   }
 }

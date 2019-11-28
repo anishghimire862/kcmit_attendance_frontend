@@ -104,7 +104,7 @@ export default {
       this.redirectToAttendancePage()
     },
     redirectToAttendancePage () {
-      this.$router.push('/attendance/' + this.faculty + '/' + this.semester + '/' + this.section + '/' + this.subjectId + '/')
+      this.$router.push('/attendance/' + this.faculty + '/' + this.section + '/' + this.semester + '/' + this.subjectId + '/')
     },
     getSubjects () {
       const url = '/subjects/'

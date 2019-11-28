@@ -80,27 +80,30 @@
         let self = this
         this.$axios.get(url +this.faculty + '/' + this.section + '/' + this.semester + '/')
           .then (function(response) {
-            self.apiDataStudents = response.data.students
+            self.apiDataStudents = response.data
           })
       },
       submitData () {
         let studentsData = this.$refs.att.items
+        console.log(studentsData)
         let studentsAttendanceData = []
         for(var key in studentsData) {
           if(studentsData[key].status === false || !studentsData[key].status) {
             studentsAttendanceData.push({
               status: false,
-              student_id: studentsData[key].student_id,
-              student_semester_id: studentsData[key].student_semester_id,
-              subject_code: this.subjectId
+              semester: this.semester,
+              student_id: studentsData[key].id,
+              // student_semester_id: studentsData[key].student_semester_id,
+              subject_id: this.subjectId
             })
           }
           else {
             studentsAttendanceData.push({
               status: true,
-              student_id: studentsData[key].student_id || null,
-              student_semester_id: studentsData[key].student_semester_id,
-              subject_code: this.subjectId
+              student_id: studentsData[key].id || null,
+              semester: this.semester,
+              // student_semester_id: studentsData[key].student_semester_id,
+              subject_id: this.subjectId
             })
           }
         }
