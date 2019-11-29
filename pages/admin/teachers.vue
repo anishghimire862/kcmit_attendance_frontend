@@ -9,6 +9,40 @@
       @add="addNewTeacher"
     />
     <v-dialog
+      v-model="deleteDialog"
+      width="400"
+    >
+       <v-card
+       >
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                Are you sure you want to delete this ?
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="closeDeleteDialog"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="deleteTeacher"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
       v-model="dialog"
       max-width="500px"
     >
@@ -42,8 +76,9 @@
                   @preview="openPreview"
                 />
                 <v-img
-                  v-if="url"
-                  :src="url"
+                  v-model="editedItem.image"
+                  v-if="url || editedItem.image"
+                  :src="url || 'http://localhost:8001/' +editedItem.image"
                   width="100%"
                   height="24vw"
                   contain
@@ -76,35 +111,6 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-       <v-card
-        v-else
-       >
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                Are you sure you want to delete this ?
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="close"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-          >
-            Delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
     </v-dialog>
     <v-snackbar/>
   </div>
@@ -120,26 +126,13 @@
     data () {
       return {
         dialog: false,
+        deleteDialog: false,
         url: '',
         headers: [
           { text: 'Image', value: 'image' },
           { text: 'Name', value: 'name' },
           { text: 'Email', value: 'email' },
           { text: 'Actions', value: 'actions', sortable: false },
-        ],
-        items: [
-          {
-            name: 'Frozen Yogurt',
-            image: 'imgpsh_mobile_save.jpeg',
-            email: 'anishg@gmail.com',
-            phone: '+97798888888'
-          },
-          {
-            name: 'Ice cream sandwich',
-            image: 'imgpsh_mobile_save.jpeg',
-            email: 'anish@gmail.cp',
-            phone: '+97798888888'
-          }
         ],
         listTitle: 'Teachers',
         editItem: false,
@@ -149,8 +142,11 @@
           name: '',
           phone: null,
           email: null,
+          image: ''
         },
-        apiDataTeachers: []
+        apiDataTeachers: [],
+        file: '',
+        deleteItemId: null
       }
     },
     computed: {
@@ -172,8 +168,10 @@
       deleteTeacherDetails (value) {
         this.addItem = false
         this.editItem = false
-        this.dialog = true
+        this.dialog = false
         this.deleteItem = true
+        this.deleteDialog = true
+        this.deleteItemId = value.id
       },
       addNewTeacher() {
         this.dialog = true
@@ -183,6 +181,7 @@
       },
       close () {
         this.dialog = false
+        this.url = ''
       },
       batchListGenerator  () {
         let getYear = new Date().getFullYear()
@@ -190,6 +189,7 @@
       },
       openPreview (file) {
         this.url = URL.createObjectURL(file)
+        this.file = file
       },
       getData () {
         const url = '/teachers/'
@@ -203,8 +203,14 @@
       submitData () {
         const url = '/teachers/'
         let self = this
+        let formData = new FormData()
+        formData.append('image', this.file)
+        formData.append('name', this.editedItem.name)
+        formData.append('email', this.editedItem.email)
+        formData.append('phone', this.editedItem.phone)
         if(this.editItem) {
-          this.$axios.patch(url, this.editedItem)
+          formData.append('id', this.editedItem.id)
+          this.$axios.patch(url, formData)
             .then(function (response) {
               self.$toast('Teacher updated successfully')
               self.getData()
@@ -215,7 +221,7 @@
               self.$toast.error('There was an error, please try again.')
             })
         } else {
-          this.$axios.post(url, this.editedItem)
+          this.$axios.post(url, formData)
             .then(function (response) {
               self.$toast('Please inform to check email for login details')
               self.getData()
@@ -225,6 +231,24 @@
               self.$toast.error('There was an error, please try again.')
             })
         }
+      },
+      deleteTeacher () {
+        const url = '/teachers/' + this.deleteItemId
+        let self = this
+        this.$axios.delete(url)
+          .then(function (response) {
+            self.$toast('Teacher deleted successfully.')
+            self.getData()
+          })
+          .catch(function (error) {
+            self.$toast.error('There was a problem.')
+          })
+          .finally(function() {
+            self.deleteDialog = false
+          })
+      },
+      closeDeleteDialog () {
+        this.deleteDialog = false
       }
     }
   }
