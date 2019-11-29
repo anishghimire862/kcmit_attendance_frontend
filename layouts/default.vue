@@ -134,16 +134,6 @@ export default {
           icon: 'mdi-book-open-page-variant',
           title: 'Subjects',
           to: '/admin/subjects'
-        },
-        {
-          icon: 'mdi-account',
-          title: 'Student Semesters',
-          to: '/admin/student-semester'
-        },
-        {
-          icon: 'mdi-account-check',
-          title: 'Teacher Subjects',
-          to: '/admin/teacher-subject'
         }
       ],
       teacherItems: [
