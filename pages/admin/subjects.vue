@@ -9,6 +9,40 @@
       @add="addNewSubject"
     />
     <v-dialog
+      v-model="deleteDialog"
+      width="400"
+    >
+       <v-card
+       >
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                Are you sure you want to delete this ?
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="closeDeleteDialog"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="deleteSubject"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
       v-model="dialog"
       max-width="500px"
     >
@@ -57,35 +91,6 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-       <v-card
-        v-else
-       >
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                Are you sure you want to delete this ?
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="close"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-          >
-            Delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
     </v-dialog>
     <v-snackbar/>
   </div>
@@ -99,21 +104,12 @@
     data () {
       return {
         dialog: false,
+        deleteDialog: false,
         url: '',
         headers: [
           { text: 'Subject Code', value: 'subject_code' },
           { text: 'Subject Name', value: 'subject_name' },
           { text: 'Actions', value: 'actions', sortable: false },
-        ],
-        items: [
-          {
-            subjectName: 'Frozen Yogurt',
-            subjectCode: '0001'
-          },
-          {
-            subjectName: 'Frozen Yogurt',
-            subjectCode: '0001'
-          }
         ],
         listTitle: 'Subjects',
         editItem: false,
@@ -123,7 +119,8 @@
           subject_code: '',
           subject_name: ''
         },
-        apiDataSubjects: []
+        apiDataSubjects: [],
+        deleteItemId: null
       }
     },
     created () {
@@ -144,8 +141,10 @@
       deleteSubjectDetails (value) {
         this.addItem = false
         this.editItem = false
-        this.dialog = true
+        this.dialog = false
         this.deleteItem = true
+        this.deleteDialog = true
+        this.deleteItemId = value.id
       },
       addNewSubject() {
         this.dialog = true
@@ -190,6 +189,24 @@
             })
         }
       },
+      deleteSubject () {
+        const url = '/subjects/' + this.deleteItemId
+        let self = this
+        this.$axios.delete(url)
+          .then(function (response) {
+            self.$toast('Subject deleted successfully.')
+            self.getData()
+          })
+          .catch(function (error) {
+            self.$toast.error('There was a problem.')
+          })
+          .finally(function() {
+            self.deleteDialog = false
+          })
+      },
+      closeDeleteDialog () {
+        this.deleteDialog = false
+      }
     }
   }
 </script>
