@@ -133,6 +133,15 @@
   </v-card>
   <v-col v-if="loadCalendar" class="pa-0 ma-0 pt-3">
     <v-card>
+      <v-card-actions>
+        <v-btn
+          text
+          outlined
+          @click="exportExcelSheet"
+        >
+          Export Report
+        </v-btn>
+      </v-card-actions>
       <v-sheet height="600">
         <v-btn
           class="ma-2"
@@ -245,7 +254,12 @@ export default {
   },
   mounted () {
     this.getSubjects()
-	},
+  },
+  watch: {
+    fromDate: function(val) {
+      this.focus = val
+    }
+  },
   methods: {
     submit (event) {
       event.preventDefault()
@@ -256,6 +270,27 @@ export default {
             self.events = response.data.data
           })
       this.loadCalendar = true
+    },
+    exportExcelSheet () {
+      let fileName = 'Excel.xlsx'
+      const url = '/excel/'
+        let self = this
+        this.$axios.get(url +this.semester + '/' + this.section + '/' + this.faculty + '/' + this.subjectId + '/' + this.fromDate + '/' +  this.toDate)
+          .then (function(response) {
+            // let blob = new Blob([response.data], { type: 'application/vnd.openxmlformats' }),
+            // link = window.URL.createObjectURL(blob)
+            // window.open(link)
+
+const data = URL.createObjectURL(new Blob([response.data], {
+        type: 'application/vnd.ms-excel'
+    }))
+    const link = document.createElement('a')
+    link.href = data
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+
+          })
     },
     getSubjects () {
       const url = '/subjects/'
