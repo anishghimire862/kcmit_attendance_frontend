@@ -1,5 +1,6 @@
 <template>
   <v-card>
+    {{ computedFaculties }}
     <v-card-text>
       <v-alert
         dense
@@ -95,25 +96,43 @@ export default {
         subjectId: ''
     }
   },
+
   mounted () {
     this.getSubjects()
-	},
+  },
+
+  computed: {
+    computedFaculties () {
+      let getFaculty = this.subjects.map(subject => subject.faculty)
+      let filteredFaculty = getFaculty.filter(faculty => faculty == this.subjects.faculty)
+      return filteredFaculty
+    }
+  },
+
   methods: {
     submit (event) {
       event.preventDefault()
       this.redirectToAttendancePage()
     },
+
     redirectToAttendancePage () {
       this.$router.push('/attendance/' + this.faculty + '/' + this.section + '/' + this.semester + '/' + this.subjectId + '/')
     },
+
     getSubjects () {
-      const url = '/subjects/'
+      const teacherId = this.getLoggedInUserId()
+      const url = '/teacher_subjects/' +teacherId
       let self = this
       this.$axios.get(url)
         .then (function(response) {
            self.subjects = response.data.data
         })
+    },
+
+    getLoggedInUserId () {
+      return this.$auth.user.data[0].id
     }
+
   }
 }
 </script>
