@@ -4,10 +4,77 @@
       :headers="headers"
       :items="apiDataSubjects"
       :list-title="listTitle"
+      :expand-table="true"
       @edit="editSubjectDetails"
       @delete="deleteSubjectDetails"
       @add="addNewSubject"
-    />
+      @clickedAssignTeacher="clickedAssignTeacher"
+    >
+      <template v-slot:subject>
+        <v-row no-gutters>
+          <v-col md-6 sm-12>
+            <div class="pa-2">
+              <v-autocomplete
+                label="Teacher"
+                :items="teachers"
+                item-text="name"
+                item-value="id"
+                v-model="teacherId"
+              ></v-autocomplete>
+              <v-select
+                :items="semesters"
+                v-model="semester"
+                label="Semester"
+              ></v-select>
+              <v-select
+                :items="faculties"
+                v-model="faculty"
+                label="Faculty"
+              ></v-select>
+              <div
+                class="text-right"
+              >
+                <v-btn
+                  class="ma-2"
+                  outlined
+                  color="indigo"
+                  @click="assignTeacher"
+                >
+                  Submit
+                </v-btn>
+              </div>
+            </div>
+          </v-col>
+          <v-divider
+            vertical
+            color="primary"
+          > </v-divider>
+          <v-col md-6 sm-12>
+            <p class="caption grey--text pl-2"> This subject has been assigned to the following teachers: </p>
+            <v-list v-if="subjectDetails.length" two-line class="pa-0 ma-0">
+              <v-list-item
+                v-for="item in subjectDetails"
+               :key="item.id"
+              >
+                <v-list-item-avatar>
+                  <img :src="'http://localhost:8001/' +item.teacherImage" />
+                </v-list-item-avatar>
+
+                <v-list-item-content class="subtitle">
+                  <v-list-item-title v-text="item.teacherName" class="adjust-font-title"></v-list-item-title>
+                  <v-list-item-subtitle>
+                    <span class="adjust-font-subtitle"> Faculty: {{ item.faculty }} , Semester: {{ item.semester }} </span>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+            <span v-else>
+              <p class="subtitle pl-2"> N/A </p>
+            </span>
+          </v-col>
+        </v-row>
+      </template>
+    </list>
     <v-dialog
       v-model="deleteDialog"
       width="400"
@@ -95,6 +162,14 @@
     <v-snackbar/>
   </div>
 </template>
+<style scoped>
+  .adjust-font-subtitle {
+    font-size: 0.7em;
+  }
+  .adjust-font-title {
+    font-size: 0.9em;
+  }
+</style>
 <script>
   import List from "~/components/lists.vue"
   export default {
@@ -110,6 +185,7 @@
           { text: 'Subject Code', value: 'subject_code' },
           { text: 'Subject Name', value: 'subject_name' },
           { text: 'Actions', value: 'actions', sortable: false },
+          { text: '', value: 'data-table-expand' }
         ],
         listTitle: 'Subjects',
         editItem: false,
@@ -120,7 +196,15 @@
           subject_name: ''
         },
         apiDataSubjects: [],
-        deleteItemId: null
+        subjectDetails: [],
+        deleteItemId: null,
+        teachers: [],
+        semesters: [1,2,3,4,5,6,7,8],
+        semester: null,
+        faculties: ['BIM', 'BBA', 'BCA'],
+        faculty: null,
+        teacherId: '',
+        subjectId: ''
       }
     },
     created () {
@@ -185,7 +269,6 @@
               self.$toast('Subject added successfully')
               self.getData()
               self.close()
-
             })
         }
       },
@@ -204,6 +287,51 @@
             self.deleteDialog = false
           })
       },
+
+      clickedAssignTeacher(val) {
+        this.subjectId = val.item.id;
+        this.getSubjectDetails()
+      },
+
+      getSubjectDetails () {
+        const url = '/subject_details/' + this.subjectId
+        // for reference inside promise
+        let self = this
+        this.$axios.get(url)
+          .then (function(response) {
+            self.subjectDetails = response.data.data
+            self.getTeachers()
+        })
+      },
+
+      getTeachers () {
+        const url = '/teachers/'
+        let self = this
+        this.$axios.get(url)
+          .then (function(response) {
+            self.teachers = response.data.data
+          })
+      },
+
+      assignTeacher() {
+        let subject = this.subjectId
+        let semester = this.semester
+        let faculty = this.faculty
+        let teacher = this.teacherId
+        let url = '/teacher_subjects'
+
+        let self = this
+
+        this.$axios.post(url, {subjectId: subject, semester: semester, faculty: faculty, teacherId: teacher })
+          .then (function(response) {
+            self.getSubjectDetails()
+            self.$toast('Teacher assigned successfully.')
+            self.teacherId = ''
+            self.semester = ''
+            self.faculty = ''
+        })
+      },
+
       closeDeleteDialog () {
         this.deleteDialog = false
       }
