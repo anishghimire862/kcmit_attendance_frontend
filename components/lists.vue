@@ -5,6 +5,10 @@
     :items="items"
     sort-by="name"
     class="elevation-1"
+    :show-expand="expandTable ? true : false"
+    @item-expanded="clickedAssignTeacher"
+    :item-key="items.id"
+    single-expand
   >
     <template v-slot:top>
       <v-toolbar flat color="white">
@@ -49,6 +53,25 @@
         <img :src="'http://localhost:8001/' +item.image" />
       </v-avatar>
     </template>
+    <template v-slot:item.data-table-expand="{ expand, isExpanded }">
+        <div
+          class="text-right"
+        >
+          <v-btn
+            class="ma-2"
+            outlined
+            color="indigo"
+            @click="expand(!isExpanded)"
+          >
+            Assign
+          </v-btn>
+        </div>
+    </template>
+    <template v-slot:expanded-item="{ headers }">
+      <td :colspan="headers.length" class="pa-0">
+        <slot name="subject"> N/A </slot>
+      </td>
+    </template>
   </v-data-table>
 </template>
 <script>
@@ -65,9 +88,16 @@
       listTitle: {
         type: String,
         required: true
+      },
+      expandTable: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
+      clickedAssignTeacher(val) {
+        this.$emit('clickedAssignTeacher', val)
+      }
     }
   }
 </script>
