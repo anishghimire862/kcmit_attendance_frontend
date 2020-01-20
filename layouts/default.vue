@@ -121,6 +121,11 @@ export default {
           to: '/selection'
         },
         {
+          icon: 'mdi-chart-bubble',
+          title: 'View Attendance',
+          to: '/sheet'
+        },
+        {
           icon: 'mdi-account',
           title: 'Students',
           to: '/admin/students'
