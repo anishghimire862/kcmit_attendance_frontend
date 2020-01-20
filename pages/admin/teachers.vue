@@ -215,7 +215,6 @@
               self.$toast('Teacher updated successfully')
               self.getData()
               self.close()
-
             })
             .catch(function (error) {
               self.$toast.error('There was an error, please try again.')
