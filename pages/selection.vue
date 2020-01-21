@@ -1,6 +1,5 @@
 <template>
   <v-card>
-    {{ computedFaculties }}
     <v-card-text>
       <v-alert
         dense
@@ -18,7 +17,7 @@
               md="3"
             >
               <v-select
-                :items="faculties"
+                :items="filterFaculty"
                 v-model="faculty"
                 label="Faculty"
               ></v-select>
@@ -28,7 +27,7 @@
               md="3"
             >
               <v-select
-                :items="semesters"
+                :items="filterSemester"
                 v-model="semester"
                 label="Semester"
               ></v-select>
@@ -49,7 +48,7 @@
             >
               <v-autocomplete
                 label="Subject"
-                :items="subjects"
+                :items="filterSubjects"
                 item-text="subject_name"
                 item-value="id"
                 v-model="subjectId"
@@ -102,14 +101,46 @@ export default {
   },
 
   computed: {
-    computedFaculties () {
-      let getFaculty = this.subjects.map(subject => subject.faculty)
-      let filteredFaculty = getFaculty.filter(faculty => faculty == this.subjects.faculty)
-      return filteredFaculty
+    filterSemester() {
+      return this.genericFilter('semester', this.semesters)
+    },
+    filterFaculty() {
+      return this.genericFilter('faculty', this.faculties)
+    },
+    filterSubjects() {
+      return this.subjectFilter()
     }
   },
 
   methods: {
+    genericFilter(fieldName, existingArray) {
+      let arrayToBePopulate = []
+      this.subjects.map(x => {
+        if(fieldName === 'semester')
+          arrayToBePopulate.push(x.semester)
+        if(fieldName === 'faculty')
+          arrayToBePopulate.push(x.faculty)
+      })
+
+      let removeDublicates = [...new Set(arrayToBePopulate)]
+
+      let mappedData = removeDublicates.map(x => {
+        let filteredData = existingArray.filter(y =>  x == y)
+        return filteredData
+      })
+
+      return mappedData
+    },
+
+    subjectFilter() {
+      let selectedSemester = this.semester
+      let selectedFaculty = this.faculty
+
+      let filteredSubjects = this.subjects.filter(subject => subject.semester == selectedSemester && subject.faculty == selectedFaculty)
+      console.log(filteredSubjects)
+      return filteredSubjects
+    },
+
     submit (event) {
       event.preventDefault()
       this.redirectToAttendancePage()
@@ -127,6 +158,8 @@ export default {
         .then (function(response) {
            self.subjects = response.data.data
         })
+
+      this.subjectFilter()
     },
 
     getLoggedInUserId () {
