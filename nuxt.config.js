@@ -30,7 +30,8 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '~/plugins/vuetify'
+    '~/plugins/vuetify',
+    { src: '~/plugins/vue-chartjs.js', mode: 'client' }
   ],
   /*
   ** Nuxt.js dev-modules
@@ -105,6 +106,7 @@ export default {
     /*
     ** You can extend webpack config here
     */
+    transpile: ['vue-charts', 'resize-detector'],
     extend (config, ctx) {
         // Run ESLint on save
     }
