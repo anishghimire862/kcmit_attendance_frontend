@@ -50,7 +50,7 @@
                 label="Subject"
                 :items="filterSubjects"
                 item-text="subject_name"
-                item-value="id"
+                item-value="subjectId"
                 v-model="subjectId"
               ></v-autocomplete>
             </v-col>
