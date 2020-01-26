@@ -77,6 +77,19 @@
                 ></v-select>
               </v-col>
               <v-col cols="12">
+                <v-select
+                  :items="sections"
+                  v-model="section"
+                  label="Section"
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-radio-group v-model="gender" row>
+                  <v-radio label="Male" value="male"></v-radio>
+                  <v-radio label="Female" value="female"></v-radio>
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12">
                 <FileUpload
                   :url-link="url"
                   @preview="openPreview"
@@ -148,6 +161,9 @@
         deleteItem: false,
         batchList: [],
         facultyList: ['BIM', 'BBA', 'BCA'],
+        sections: ['A', 'B'],
+        gender: 'male',
+        section: null,
         editedItem: {
           name: '',
           batch: null,
@@ -219,6 +235,7 @@
         formData.append('batch', this.editedItem.batch)
         formData.append('faculty', this.editedItem.faculty)
         formData.append('section', this.editedItem.section)
+        formData.append('gender', this.editedItem.gender)
         formData.append('name', this.editedItem.name)
         formData.append('email', this.editedItem.email)
         formData.append('phone', this.editedItem.phone)
