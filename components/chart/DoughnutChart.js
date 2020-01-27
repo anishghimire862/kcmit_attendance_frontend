@@ -1,30 +1,14 @@
-import { Doughnut } from 'vue-chartjs'
+import { Bar, mixins } from 'vue-chartjs'
+const { reactiveProp } = mixins
 
 export default {
-  extends: Doughnut,
-  // data: () => ({
-  //   chartdata: {
-  //     labels: ['Male', 'Female', 'Total'],
-  //     datasets: [{
-  //       data: [100,150,50 ],
-  //       backgroundColor: [
-  //         'rgba(255, 99, 132, 0.2)',
-  //         'rgba(54, 162, 235, 0.2)',
-  //         'rgba(255, 206, 86, 0.2)',
-  //       ],
-  //     }]
-  //   },
-  //   options: {
-
-  //   },
-  //   responsive: true,
-  //   maintainAspectRatio: false
-  // }),
+  extends: Bar,
+  mixins: [reactiveProp],
 
   props: {
-    chartdata: {
+    chartData: {
       type: Object,
-      default: null
+      required: false
     },
     options: {
       type: Object,
@@ -33,6 +17,6 @@ export default {
   },
 
   mounted () {
-    this.renderChart(this.chartdata, this.options)
+    this.renderChart(this.chartData, this.options)
   }
 }
