@@ -1,11 +1,11 @@
 <template>
   <div>
     <div style="width:300px; height:300px">
-      ss
-      {{ chartdata }}
+      {{ options }}
       <DoughnutChart
         v-if="loaded"
-        :chartdata="chartdata"
+        :chart-data="chartData"
+        :options="options"
       ></DoughnutChart>
     </div>
   </div>
@@ -16,44 +16,61 @@ import DoughnutChart from '~/components/chart/DoughnutChart.js'
 
 export default {
   components: { DoughnutChart },
+
   data: () => ({
     loaded: false,
-    chartdata: null
+    chartData: null,
+    items: [],
+    labels: ['Present', 'Absent'],
+    options: null
   }),
+
   async mounted () {
-    // this.getData()
-    this.loaded = false
-    try {
-      await this.$axios.get('/daily_report/7/6')
-        .then(function(response) {
-          let data = response.data.data
-          let count = []
-          for(let i=0; i<data.length; i++) {
-            count.push(data[i].count)
-          }
-          console.log(count)
-          self.chartdata = count
-        })
-      this.loaded = true
-    } catch (e) {
-      console.error(e)
+    let json = await this.$axios.get('/daily_report/7/6');
+
+    let data = json.data.data
+
+    for(let i=0; i<data.length; i++) {
+      this.items.push(data[i].count)
     }
+
+    this.chartData = {
+      labels: this.labels,
+      datasets: [{
+        labels: 'Data One',
+        data: JSON.stringify(this.items),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255,99,132,1)',
+          'rgba(54, 162, 235, 1)'
+        ],
+      }],
+    }
+
+    this.options = {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          },
+          gridLines: {
+            display: false
+          }
+        }],
+      xAxes: [{
+        gridLines: {
+          display: true
+        },
+      }]
+    }
+  }
+  this.loaded = true
   },
 
   methods: {
-    // getData () {
-    //   this.$axios.get('daily_report/7/6')
-    //     .then (function(response) {
-    //       let data = response.data.data
-    //       let count = []
-    //       for(let i=0; i<data.length; i++) {
-    //         count.push(data[i].count)
-    //       }
-    //       console.log(count)
-    //       self.chartdata = count
-    //       self.loaded = true
-    //     })
-    //   }
   }
 
 }
