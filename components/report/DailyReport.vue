@@ -7,13 +7,18 @@
       ></v-toolbar-title>
       <v-spacer> </v-spacer>
       <a
+        v-if="loaded"
         class="caption"
         @click="displayDoughnutChart()"
         v-text="doughnutView ? `Bar Chart` : `Doughnut Chart`"
       >
       </a>
     </v-toolbar>
-    <v-tabs vertical @change="emitChange">
+    <v-tabs
+      v-if="subjects"
+      vertical
+      @change="emitChange"
+    >
       <v-tab
         v-for="subject in subjects"
         :key="subject.id"
@@ -38,9 +43,17 @@
                 :chart-data="chartData"
                 :options="options"
               ></BarChart>
-              <p v-else>
-                Loading...
-              </p>
+              <div
+                v-else
+                align="center"
+              >
+                <v-img
+                  :src="loadingImage"
+                  aspect-ratio="1"
+                  max-width="500"
+                  max-height="300"
+                />
+              </div>
             </div>
             <div
               v-else
@@ -49,15 +62,35 @@
               <DoughnutChart
                 v-if="loaded"
                 :chart-data="doughnutChartData"
+                :options="doughnutOptions"
               ></DoughnutChart>
-              <p v-else>
-                Loading...
-              </p>
+              <div
+                v-else
+                align="center"
+              >
+                <v-img
+                  :src="loadingImage"
+                  aspect-ratio="1"
+                  max-width="500"
+                  max-height="300"
+                />
+              </div>
             </div>
           </v-card-text>
         </v-card>
       </v-tab-item>
     </v-tabs>
+    <div
+      v-else
+      align="center"
+    >
+      <v-img
+        :src="noResultImage"
+        aspect-ratio="1"
+        max-width="500"
+        max-height="300"
+      />
+    </div>
   </v-card>
 </template>
 <script>
@@ -74,9 +107,12 @@ export default {
     items: [],
     labels: ['Absent', 'Present'],
     options: null,
+    doughnutOptions: null,
     subjects: [],
     yesterdaysSubjects: [],
-    doughnutView: false
+    doughnutView: false,
+    noResultImage: require('@/static/no_result.gif'),
+    loadingImage: require('@/static/loadiing.gif'),
   }),
 
   props: {
@@ -85,10 +121,16 @@ export default {
   },
 
   created() {
-    this.getTodaysSubjects()
   },
 
   mounted () {
+    this.$nextTick(() => {
+      this.getTodaysSubjects()
+    })
+  },
+
+  computed: {
+
   },
 
   methods: {
@@ -98,13 +140,11 @@ export default {
         this.$axios.get('/todays_subjects')
           .then(function(response) {
             self.subjects = response.data.data
-            self.getData()
          })
       } else {
           this.$axios.get('/yesterdays_subjects')
           .then(function(response) {
             self.subjects = response.data.data
-            self.getData()
          })
       }
 
@@ -135,14 +175,13 @@ export default {
       }
 
       !this.doughnutView ? this.renderChart() : this.displayDoughnutChart()
-
     },
 
     renderChart () {
       this.chartData = {
         labels: this.labels,
         datasets: [{
-          labels: 'Data',
+          label: 'Data',
           data: this.items,
           backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
@@ -156,22 +195,25 @@ export default {
       }
 
       this.options = {
+        legend: {
+          display: false
+        },
         scales: {
           yAxes: [{
             ticks: {
               beginAtZero: true
             },
             gridLines: {
-              display: true
+              display: false
             }
           }],
-        xAxes: [{
-          gridLines: {
-            display: true
-          },
-        }]
+          xAxes: [{
+            gridLines: {
+              display: false
+            },
+          }]
+        }
       }
-    }
       this.loaded = true
     },
 
@@ -183,7 +225,7 @@ export default {
       this.doughnutChartData = {
         labels: this.labels,
         datasets: [{
-          labels: 'Data',
+          label: 'Data',
           data: this.items,
           backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
@@ -196,12 +238,21 @@ export default {
         }],
       }
 
-      this.options = {
+      this.doughnutOptions = {
+        legend: {
+          display: false
+        },
 
+        xAxes: [{
+          gridLines: {
+            display: false
+          },
+        }]
       }
       this.loaded = true
+      this.renderChart()
       this.doughnutView = !this.doughnutView
-    }
+    },
   }
 }
 </script>

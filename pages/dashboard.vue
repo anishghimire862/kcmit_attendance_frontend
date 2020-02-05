@@ -5,14 +5,18 @@
       :yesterday="true"
       class="mt-3"
     />
+    <WeeklyReport
+      class="mt-3"
+    />
   </div>
 </template>
 
 <script>
 import DailyReport from '~/components/report/DailyReport.vue'
+import WeeklyReport from '~/components/report/WeeklyReport.vue'
 
 export default {
-  components: { DailyReport },
+  components: { DailyReport, WeeklyReport },
 
   data: () => ({
   }),

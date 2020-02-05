@@ -117,6 +117,11 @@ export default {
       adminItems: [
         {
           icon: 'mdi-newspaper',
+          title: 'Dashboard',
+          to: '/dashboard'
+        },
+        {
+          icon: 'mdi-newspaper',
           title: 'Attendance',
           to: '/selection'
         },
@@ -142,6 +147,11 @@ export default {
         }
       ],
       teacherItems: [
+        {
+          icon: 'mdi-apps',
+          title: 'Dashboard',
+          to: '/dashboard'
+        },
         {
           icon: 'mdi-apps',
           title: 'Attendance',
